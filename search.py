@@ -112,6 +112,8 @@ def breadthFirstSearch(problem):
         estado, recorrido = por_visitar.pop()
 
         if estado not in visitados:
+            print(f'NUEVO ESTADO: {estado}')
+
             if not problem.isGoalState(estado):
                 visitados.add(estado)
 

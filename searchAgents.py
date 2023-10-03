@@ -301,6 +301,12 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        """Search the shallowest nodes in the search tree first."""
+        "*** YOUR CODE HERE ***"
+        self.pursuedGoals=0
+        self.reachedCorners=set()
+
+
 
     def getStartState(self):
         """
@@ -308,14 +314,22 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startingPosition + (0,)
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        x, y, goals = state
+        if (x, y) in self.corners and (x, y) not in self.reachedCorners:
+            self.reachedCorners.add((x, y))
+            self.pursuedGoals += 1
+        if len(self.corners) == self.pursuedGoals:
+            print(f'{len(self.corners)}GOAL STATEE!!!!!!!!!!!!!!!{self.pursuedGoals}')
+            return True
+        else: return False
+
 
     def getSuccessors(self, state):
         """
@@ -338,6 +352,12 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y, goals = state
+            dx, dy =Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                successors.append(((nextx, nexty, self.pursuedGoals), action, 1))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
