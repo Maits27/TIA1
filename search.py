@@ -81,113 +81,68 @@ def tinyMazeSearch(problem):
 
 
 def depthFirstSearch(problem):
-    # util.raiseNotDefined()
     recorrido = []
     por_visitar = util.Stack()
-    visitados = {}
-    actual = problem.getStartState()
-    atras = False
+    visitados = set()
+    por_visitar.push((problem.getStartState(), recorrido))
 
-    if problem.isGoalState(actual):
-        return recorrido
-    else:
-        visitados[actual] = actual
-        for e in problem.getSuccessors(actual):
-            por_visitar.push([actual, e])
+    while not por_visitar.isEmpty():
+        estado, recorrido = por_visitar.pop()
 
-        while len(por_visitar) > 0:
+        if not problem.isGoalState(estado):
+            visitados.add(estado)
 
-            if not atras:
-                siguiente = por_visitar.pop()
-            atras = False
-
-            if siguiente[1][0] not in visitados:
-                visitados[siguiente[1][0]] = actual
-                recorrido.append(siguiente[1][1])
-                actual = siguiente[1][0]
-                if not problem.isGoalState(actual):
-                    for e in problem.getSuccessors(actual):
-                        por_visitar.push([actual, e])
-                else:
-                    return recorrido
-            else:
-                atras = True
-                siguiente = por_visitar.pop()
-                while siguiente[0] != actual:
-                    actual = visitados[actual]
-                    recorrido.pop()
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    "*** YOUR CODE HERE ***"
-    '''print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))'''
-
-    recorrido = []
-    por_visitar = []
-    visitados = {}
-    start = problem.getStartState()
-    atras = False
-
-    if problem.isGoalState(start):
-        return recorrido
-    else:
-        actual = start
-        visitados[start]=start
-        for e in problem.getSuccessors(start):
-            por_visitar.append([start, e])
-
-        while len(por_visitar) > 0:
-
-            if not atras:
-                siguiente = por_visitar.pop()
-            atras=False
-
-            if siguiente[1][0] not in visitados:
-                visitados[siguiente[1][0]]= actual
-                recorrido.append(siguiente[1][1])
-
-                actual = siguiente[1][0]
-                if not problem.isGoalState(actual):
-                    for e in problem.getSuccessors(actual):
-                        por_visitar.append([actual, e])
-                else:
-                    return recorrido
-            else:
-                atras = True
-                siguiente = por_visitar.pop()
-                while siguiente[0] != actual:
-                    actual=visitados[actual]
-                    recorrido.pop()
-        print(f'IMPOSIBLE LLEGAR AL PUNTO FINAL!!!!!!!!!!!')
-
-    
-    
-
-
+            for e in problem.getSuccessors(estado):
+                if e[0] not in visitados:
+                    por_visitar.push((e[0], recorrido + [e[1]]))
+        else:
+            break
+    return recorrido
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    recorrido = []
+    por_visitar = util.Queue()
+    visitados = set()
+    por_visitar.push((problem.getStartState(), recorrido))
+
+    while not por_visitar.isEmpty():
+        estado, recorrido = por_visitar.pop()
+
+        if estado not in visitados:
+            if not problem.isGoalState(estado):
+                visitados.add(estado)
+
+                for e in problem.getSuccessors(estado):
+                    por_visitar.push((e[0], recorrido+[e[1]]))
+            else: break
+    return recorrido
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    recorrido = []
+    coste_acumulado=0
+    coste_nuevo=0
+    por_visitar = util.PriorityQueue()
+    visitados = set()
+    por_visitar.push((problem.getStartState(), recorrido, coste_acumulado), coste_acumulado)
+
+    while not por_visitar.isEmpty():
+        estado, recorrido, coste_acumulado = por_visitar.pop()
+
+        if estado not in visitados:
+            if not problem.isGoalState(estado):
+                visitados.add(estado)
+
+                for e in problem.getSuccessors(estado):
+                    coste_nuevo=coste_acumulado+e[2]
+                    por_visitar.push((e[0], recorrido+[e[1]], coste_nuevo), coste_nuevo)
+            else: break
+    return recorrido
 
 
 def nullHeuristic(state, problem=None):
@@ -201,7 +156,27 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    recorrido = []
+    coste_acumulado=0
+    por_visitar = util.PriorityQueue()
+    visitados = set()
+    start=problem.getStartState()
+
+    dist = heuristic(start, problem) + coste_acumulado
+    por_visitar.push((start, recorrido, coste_acumulado+0), dist)
+
+    while not por_visitar.isEmpty():
+        estado, recorrido, coste_acumulado = por_visitar.pop()
+
+        if estado not in visitados:
+            if not problem.isGoalState(estado):
+                visitados.add(estado)
+
+                for e in problem.getSuccessors(estado):
+                    dist = heuristic(e[0], problem) + coste_acumulado + e[2]
+                    por_visitar.push((e[0], recorrido+[e[1]], coste_acumulado + e[2]), dist)
+            else: break
+    return recorrido
 
 
 # Abbreviations
