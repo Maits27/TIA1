@@ -110,21 +110,14 @@ def breadthFirstSearch(problem):
 
     while not por_visitar.isEmpty():
         estado, recorrido = por_visitar.pop()
-        #print(f'NUEVO ESTADO: {estado}')
         if estado not in visitados:
-            #print(f'RECORRIDO HASTA AQUI: {recorrido}')
 
             if not problem.isGoalState(estado):
                 visitados.add(estado)
-                #print(f'AÑADIDO A VISITADOS: {estado}')
 
                 for e in problem.getSuccessors(estado):
-                    #print(f'EL SUCESOR QUE AÑADO: {(e[0], recorrido+[e[1]])}')
                     por_visitar.push((e[0], recorrido+[e[1]]))
             else: break
-    #print(f'MI RECORRIDO FINAL: {recorrido}')
-    #print(visitados)
-    #print(f'ESTADO FINAL: {estado}')
     return recorrido
 
 
