@@ -303,8 +303,9 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
         """Search the shallowest nodes in the search tree first."""
         "*** YOUR CODE HERE ***"
-        self.pursuedGoals=0
-        self.reachedCorners=set()
+        self.startState = self.startingPosition + (0,)
+        self.reachedCorners = set()
+        self.cambioGoals = False
 
 
 
@@ -314,24 +315,30 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return self.startingPosition + (0,)
+        print(self.startState)
+        return self.startState
 
     def isGoalState(self, state):
+
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
         x, y, goals = state
-        if (x, y) in self.corners and (x, y) not in self.reachedCorners:
-            self.reachedCorners.add((x, y))
-            self.pursuedGoals += 1
-        if len(self.corners) == self.pursuedGoals:
-            print(f'{len(self.corners)}GOAL STATEE!!!!!!!!!!!!!!!{self.pursuedGoals}')
-            return True
-        else: return False
+        pos = (x, y)
+        if pos in self.corners:
+            if pos not in self.reachedCorners:
+                self.reachedCorners.add(pos)
+                self.cambioGoals = True
+                print(f'REACHED CORNERS: {self.reachedCorners}')
+                print(f'CAMBIO DE GOALS: {self.cambioGoals}')
+        if goals+1 == len(self.corners): return True
+        return False
+
 
 
     def getSuccessors(self, state):
+
         """
         Returns successor states, the actions they require, and a cost of 1.
 
@@ -353,13 +360,18 @@ class CornersProblem(search.SearchProblem):
 
             "*** YOUR CODE HERE ***"
             x, y, goals = state
-            dx, dy =Actions.directionToVector(action)
+            dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
+            if self.cambioGoals:
+                print(f'NUEVO ESTADO: {state}')
+                goals += 1
             if not hitsWall:
-                successors.append(((nextx, nexty, self.pursuedGoals), action, 1))
+                successors.append(((nextx, nexty, goals), action, 1))
 
         self._expanded += 1  # DO NOT CHANGE
+        if self.cambioGoals: print(f'SUCESORES: {successors}')
+        self.cambioGoals = False
         return successors
 
     def getCostOfActions(self, actions):
