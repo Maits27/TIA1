@@ -123,6 +123,8 @@ def breadthFirstSearch(problem):
                     por_visitar.push((e[0], recorrido+[e[1]]))
             else: break
     #print(f'MI RECORRIDO FINAL: {recorrido}')
+    print(visitados)
+    print(f'ESTADO FINAL: {estado}')
     return recorrido
 
 
