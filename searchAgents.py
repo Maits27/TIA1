@@ -330,7 +330,9 @@ class CornersProblem(search.SearchProblem):
             if pos not in self.reachedCorners:
                 self.reachedCorners.add(pos)
                 self.cambioGoals = True
-        if goals+1 == len(self.corners): return True
+                print(f'GOALS {goals}')
+                print(f'LEN CORNERS: {len(self.corners)}')
+                if goals == len(self.corners)-1: return True
         return False
 
 
@@ -358,18 +360,16 @@ class CornersProblem(search.SearchProblem):
 
             "*** YOUR CODE HERE ***"
             x, y, goals = state
-            print(goals)
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
             if not hitsWall:
                 if self.cambioGoals:
-                    successors.append(((nextx, nexty, goals+1), action, 1))
+                    successors.append(((nextx, nexty, len(self.reachedCorners)), action, 1))
                 else:
                     successors.append(((nextx, nexty, goals), action, 1))
 
         self._expanded += 1  # DO NOT CHANGE
-        if self.cambioGoals: print(f'SUCESORES: {successors}')
         self.cambioGoals = False
         return successors
 
