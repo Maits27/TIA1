@@ -412,19 +412,22 @@ def cornersHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     distList = []
     pos, goal = state
+    x, y = pos
     for corner in corners:
-        obstaculos = 0
+        obstaculos = False
         if corner not in goal:
-            '''x, y = pos
             while x != corner[0]:
                 x += 1 if x < corner[0] else -1
                 if walls[x][y]:
-                    obstaculos += 1
-            while y != corner[1]:
-                y += 1 if y < corner[1] else -1
-                if walls[x][y]:
-                    obstaculos += 1'''
-            distList.append(abs(corner[0] - pos[0]) + abs(corner[1] - pos[1]))
+                    obstaculos = True
+                    break
+            if not obstaculos:
+                while y != corner[1]:
+                    y += 1 if y < corner[1] else -1
+                    if walls[x][y]:
+                        obstaculos = True
+            if obstaculos: distList.append(abs(corner[0] - pos[0]) + abs(corner[1] - pos[1]))
+            else: distList.append(((corner[0] - pos[0]) ** 2 + (corner[1] - pos[1]) ** 2) ** 0.5)
     return sum(distList)/(5-len(goal))
 
 class AStarCornersAgent(SearchAgent):
