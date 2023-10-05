@@ -303,9 +303,8 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
         """Search the shallowest nodes in the search tree first."""
         "*** YOUR CODE HERE ***"
-        self.startState = self.startingPosition + (0,)
+        self.startState = (self.startingPosition, ())
         self.reachedCorners = set()
-        self.cambioGoals = False
 
 
 
@@ -324,14 +323,9 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        x, y, goals = state
-        pos = (x, y)
-        if goals<len(self.reachedCorners): return False
+        pos, goals = state
         if pos in self.corners:
-            if pos not in self.reachedCorners:
-                self.reachedCorners.add(pos)
-                self.cambioGoals = True
-                if goals == len(self.corners)-1: return True
+            if len(goals)==4: return True
         return False
 
 
@@ -358,21 +352,23 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            x, y, goals = state
-            if not self.cambioGoals:
-                if goals < len(self.reachedCorners):
-                    return successors
+            pos, goals = state
+            x, y = pos
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
+            next = (nextx, nexty)
             if not hitsWall:
-                if self.cambioGoals:
-                    successors.append(((nextx, nexty, len(self.reachedCorners)), action, 1))
+                if next in self.corners:
+                    if next not in goals:
+                        newgoals = goals + (next,)
+                    else:
+                        newgoals = goals
                 else:
-                    successors.append(((nextx, nexty, goals), action, 1))
+                    newgoals = goals
+                successors.append(((next, newgoals), action, 1))
 
         self._expanded += 1  # DO NOT CHANGE
-        self.cambioGoals = False
         return successors
 
     def getCostOfActions(self, actions):
