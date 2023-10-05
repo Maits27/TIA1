@@ -412,20 +412,20 @@ def cornersHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     distList = []
     pos, goal = state
-    obstaculos = False
     for corner in corners:
+        obstaculos = 0
         if corner not in goal:
-            inicio0 = min(pos[0], corner[0])
-            fin0 = max(pos[0], corner[0])+1
-            inicio1 = min(pos[1], corner[1])
-            fin1 = max(pos[1], corner[1]) + 1
-
-            if walls[pos[0]][inicio1:fin1]: obstaculos = True
-            elif walls[inicio0:fin0][pos[1]]: obstaculos = True
-        else: distList.append(sys.maxsize)
-        if not obstaculos: distList.append((((pos[0] - corner[0]) ** 2 + (pos[1] - corner[1]) ** 2) ** 0.5)*0.1)
-        else: distList.append(((pos[0] - corner[0]) ** 2 + (pos[1] - corner[1]) ** 2) ** 0.5)
-    return min(distList)
+            '''x, y = pos
+            while x != corner[0]:
+                x += 1 if x < corner[0] else -1
+                if walls[x][y]:
+                    obstaculos += 1
+            while y != corner[1]:
+                y += 1 if y < corner[1] else -1
+                if walls[x][y]:
+                    obstaculos += 1'''
+            distList.append(abs(corner[0] - pos[0]) + abs(corner[1] - pos[1]))
+    return sum(distList)/(5-len(goal))
 
 class AStarCornersAgent(SearchAgent):
     """A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"""
