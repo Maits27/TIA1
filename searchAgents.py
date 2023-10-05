@@ -33,7 +33,7 @@ description for details.
 
 Good luck and happy searching!
 """
-
+import sys
 import time
 
 import search
@@ -314,7 +314,6 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        print(self.startState)
         return self.startState
 
     def isGoalState(self, state):
@@ -325,7 +324,7 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
         pos, goals = state
         if pos in self.corners:
-            if len(goals)==4: return True
+            if len(goals) == 4: return True
         return False
 
 
@@ -397,13 +396,36 @@ def cornersHeuristic(state, problem):
     This function should always return a number that is a lower bound on the
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
+
+    xy1 = position
+    xy2 = problem.goal
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+
+    def euclideanHeuristic(position, problem, info={}):
+    xy1 = position
+    xy2 = problem.goal
+    return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
     """
     corners = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
-
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    distList = []
+    pos, goal = state
+    obstaculos = False
+    for corner in corners:
+        if corner not in goal:
+            inicio0 = min(pos[0], corner[0])
+            fin0 = max(pos[0], corner[0])+1
+            inicio1 = min(pos[1], corner[1])
+            fin1 = max(pos[1], corner[1]) + 1
 
+            if walls[pos[0]][inicio1:fin1]: obstaculos = True
+            elif walls[inicio0:fin0][pos[1]]: obstaculos = True
+        else: distList.append(sys.maxsize)
+        if not obstaculos: distList.append((((pos[0] - corner[0]) ** 2 + (pos[1] - corner[1]) ** 2) ** 0.5)*0.1)
+        else: distList.append(((pos[0] - corner[0]) ** 2 + (pos[1] - corner[1]) ** 2) ** 0.5)
+    return min(distList)
 
 class AStarCornersAgent(SearchAgent):
     """A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"""
