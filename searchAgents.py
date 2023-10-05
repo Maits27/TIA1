@@ -421,9 +421,6 @@ def cornersHeuristic(state, problem):
 
         dist = dist + minimo
         punto_minimo = distList.index(minimo)
-        # for e, d in enumerate(distList):
-        #     if minimo == d:
-        #         i = e
         pos = por_ver.pop(punto_minimo)
     return dist
 
@@ -526,8 +523,25 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    if state == problem.start:
+        pass
+    distanciaTotal = 0
+    while any(foodGrid):
+        min_dist = sys.maxsize
+        min_pos = (-1, -1)
+        for x, fila in enumerate(foodGrid):
+            for y, comida in enumerate(fila):
+                actual = (x,y)
+                if comida:
+                    dist_act = abs(position[0] - actual[0]) + abs(position[1] - actual[1])
+                    if dist_act < min_dist:
+                        min_dist = dist_act
+                        min_pos = actual
+        foodGrid[min_pos[0]][min_pos[1]] = False
+        position = min_pos
+        distanciaTotal = distanciaTotal + min_dist
+
+    return distanciaTotal
 
 
 class ClosestDotSearchAgent(SearchAgent):
