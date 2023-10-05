@@ -426,7 +426,7 @@ def cornersHeuristic(state, problem):
                     y += 1 if y < corner[1] else -1
                     if walls[x][y]:
                         obstaculos = True
-            if obstaculos: distList.append(abs(corner[0] - pos[0]) + abs(corner[1] - pos[1]))
+            if obstaculos: distList.append(max(abs(corner[0] - pos[0]) , abs(corner[1] - pos[1])))
             else: distList.append(((corner[0] - pos[0]) ** 2 + (corner[1] - pos[1]) ** 2) ** 0.5)
     return sum(distList)/(5-len(goal))
 
