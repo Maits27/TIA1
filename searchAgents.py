@@ -522,22 +522,36 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+
+    ''' if 'calculado' not in problem.heuristicInfo:
+        print(foodGrid)
+        print("TODAS LAS DISTANCIAS CALCULADAS:")
+        problem.heuristicInfo['calculado'] = 1
+        for x1, fila1 in enumerate(foodGrid):
+            for y1, comida1 in enumerate(fila1):
+                for x2, fila2 in enumerate(foodGrid):
+                    for y2, comida2 in enumerate(fila2):
+                        if comida1 or comida2:
+                            problem.heuristicInfo[((x1, y1), (x2, y2))] = abs(x1 - x2) + abs(y1 - y2)'''
     position, foodGrid = state
-    if state == problem.start:
-        pass
     distanciaTotal = 0
-    while any(foodGrid):
+    por_comer=[]
+
+    for x, fila in enumerate(foodGrid):
+        for y, comida in enumerate(fila):
+            if comida:
+                por_comer.append((x,y))
+
+    while por_comer:
         min_dist = sys.maxsize
         min_pos = (-1, -1)
-        for x, fila in enumerate(foodGrid):
-            for y, comida in enumerate(fila):
-                actual = (x,y)
-                if comida:
-                    dist_act = abs(position[0] - actual[0]) + abs(position[1] - actual[1])
-                    if dist_act < min_dist:
-                        min_dist = dist_act
-                        min_pos = actual
-        foodGrid[min_pos[0]][min_pos[1]] = False
+        for i, con_comida in enumerate(por_comer):
+            dist_act = abs(con_comida[0] - position[0]) + abs(con_comida[1] - position[1])
+            if dist_act < min_dist:
+                min_dist = dist_act
+                min_pos = con_comida
+                min_idx = i
+        por_comer.pop(min_idx)
         position = min_pos
         distanciaTotal = distanciaTotal + min_dist
 
