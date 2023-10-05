@@ -408,27 +408,24 @@ def cornersHeuristic(state, problem):
     return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
     """
     corners = problem.corners  # These are the corner coordinates
-    walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
+    #walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
     "*** YOUR CODE HERE ***"
-    distList = []
     pos, goal = state
-    x, y = pos
-    for corner in corners:
-        obstaculos = False
-        if corner not in goal:
-            while x != corner[0]:
-                x += 1 if x < corner[0] else -1
-                if walls[x][y]:
-                    obstaculos = True
-                    break
-            if not obstaculos:
-                while y != corner[1]:
-                    y += 1 if y < corner[1] else -1
-                    if walls[x][y]:
-                        obstaculos = True
-            if obstaculos: distList.append(max(abs(corner[0] - pos[0]) , abs(corner[1] - pos[1])))
-            else: distList.append(((corner[0] - pos[0]) ** 2 + (corner[1] - pos[1]) ** 2) ** 0.5)
-    return sum(distList)/(5-len(goal))
+    por_ver = [c for c in corners if c not in goal]
+    dist = 0
+    while por_ver:
+        distList = []
+        for corner in por_ver:
+            distList.append(abs(corner[0] - pos[0]) + abs(corner[1] - pos[1]))
+        minimo = min(distList)
+
+        dist = dist + minimo
+        punto_minimo = distList.index(minimo)
+        # for e, d in enumerate(distList):
+        #     if minimo == d:
+        #         i = e
+        pos = por_ver.pop(punto_minimo)
+    return dist
 
 class AStarCornersAgent(SearchAgent):
     """A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"""

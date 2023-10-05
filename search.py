@@ -157,10 +157,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     recorrido = []
-    coste_acumulado=0
+    coste_acumulado = 0
     por_visitar = util.PriorityQueue()
     visitados = set()
-    start=problem.getStartState()
+    start = problem.getStartState()
 
     dist = heuristic(start, problem) + coste_acumulado
     por_visitar.push((start, recorrido, coste_acumulado+0), dist)
