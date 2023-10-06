@@ -397,15 +397,6 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
 
-    xy1 = position
-    xy2 = problem.goal
-    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-
-
-    def euclideanHeuristic(position, problem, info={}):
-    xy1 = position
-    xy2 = problem.goal
-    return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
     """
     corners = problem.corners  # These are the corner coordinates
     #walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
@@ -523,16 +514,6 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
 
-    ''' if 'calculado' not in problem.heuristicInfo:
-        print(foodGrid)
-        print("TODAS LAS DISTANCIAS CALCULADAS:")
-        problem.heuristicInfo['calculado'] = 1
-        for x1, fila1 in enumerate(foodGrid):
-            for y1, comida1 in enumerate(fila1):
-                for x2, fila2 in enumerate(foodGrid):
-                    for y2, comida2 in enumerate(fila2):
-                        if comida1 or comida2:
-                            problem.heuristicInfo[((x1, y1), (x2, y2))] = abs(x1 - x2) + abs(y1 - y2)'''
     position, foodGrid = state
     distanciaTotal = 0
     por_comer=[]
@@ -546,7 +527,8 @@ def foodHeuristic(state, problem):
         min_dist = sys.maxsize
         min_pos = (-1, -1)
         for i, con_comida in enumerate(por_comer):
-            dist_act = abs(con_comida[0] - position[0]) + abs(con_comida[1] - position[1])
+            dist_act = mazeDistance(con_comida, position, problem.startingGameState)
+            # dist_act = abs(con_comida[0] - position[0]) + abs(con_comida[1] - position[1])
             if dist_act < min_dist:
                 min_dist = dist_act
                 min_pos = con_comida
@@ -554,7 +536,6 @@ def foodHeuristic(state, problem):
         por_comer.pop(min_idx)
         position = min_pos
         distanciaTotal = distanciaTotal + min_dist
-
     return distanciaTotal
 
 
@@ -586,9 +567,16 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        successors = util.PriorityQueue()
+        successors.push((startPosition, [], 0), 0)
+        while any(food):
+            position, recorrido, d_acumulada = successors.pop()
+            if problem.isGoalState(position): break
+            for s in problem.getSuccessors(position):
+                dist = d_acumulada+s[2]
+                successors.push((s[0], recorrido+[s[1]], dist), dist)
+        print(recorrido )
+        return recorrido
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -622,10 +610,13 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
+        "My code"
         x, y = state
+        if self.food[x][y]:
+            self.food[x][y] = False
+            return True
+        else: return False
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
 
 
 def mazeDistance(point1, point2, gameState):
