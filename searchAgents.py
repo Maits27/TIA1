@@ -567,15 +567,17 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        successors = util.PriorityQueue()
-        successors.push((startPosition, [], 0), 0)
+        successors = util.Queue()
+        successors.push((startPosition, []))
+        visitados = set()
+
         while any(food):
-            position, recorrido, d_acumulada = successors.pop()
+            position, recorrido = successors.pop()
             if problem.isGoalState(position): break
-            for s in problem.getSuccessors(position):
-                dist = d_acumulada+s[2]
-                successors.push((s[0], recorrido+[s[1]], dist), dist)
-        print(recorrido )
+            if position not in visitados:
+                visitados.add(position)
+                for s in problem.getSuccessors(position):
+                    successors.push((s[0], recorrido+[s[1]]))
         return recorrido
 
 class AnyFoodSearchProblem(PositionSearchProblem):
