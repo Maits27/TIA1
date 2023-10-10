@@ -515,28 +515,16 @@ def foodHeuristic(state, problem):
     """
 
     position, foodGrid = state
-    distanciaTotal = 0
-    por_comer=[]
+    por_comer = []
 
     for x, fila in enumerate(foodGrid):
         for y, comida in enumerate(fila):
             if comida:
                 por_comer.append((x,y))
-
-    while por_comer:
-        min_dist = sys.maxsize
-        min_pos = (-1, -1)
-        for i, con_comida in enumerate(por_comer):
-            dist_act = mazeDistance(con_comida, position, problem.startingGameState)
-            # dist_act = abs(con_comida[0] - position[0]) + abs(con_comida[1] - position[1])
-            if dist_act < min_dist:
-                min_dist = dist_act
-                min_pos = con_comida
-                min_idx = i
-        por_comer.pop(min_idx)
-        position = min_pos
-        distanciaTotal = distanciaTotal + min_dist
-    return distanciaTotal
+    distancias = [abs(por_comer[0] - position[0]) + abs(por_comer[1] - position[1]) for por_comer in por_comer]
+    if len(distancias)!=0:
+        return (max(distancias)+min(distancias))/2
+    return 0
 
 
 class ClosestDotSearchAgent(SearchAgent):
