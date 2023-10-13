@@ -92,17 +92,15 @@ def depthFirstSearch(problem):
         if not problem.isGoalState(estado):
             visitados.add(estado)
 
-            for e in problem.getSuccessors(estado):
-                if e[0] not in visitados:
-                    por_visitar.push((e[0], recorrido + [e[1]]))
+            for nuevo_estado, paso, coste in problem.getSuccessors(estado):
+                if nuevo_estado not in visitados:
+                    por_visitar.push((nuevo_estado, recorrido + [paso]))
         else:
             break
     return recorrido
 
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
     recorrido = []
     por_visitar = util.Queue()
     visitados = set()
@@ -115,18 +113,16 @@ def breadthFirstSearch(problem):
             if not problem.isGoalState(estado):
                 visitados.add(estado)
 
-                for e in problem.getSuccessors(estado):
-                    por_visitar.push((e[0], recorrido+[e[1]]))
-            else: break
+                for nuevo_estado, paso, coste in problem.getSuccessors(estado):
+                    por_visitar.push((nuevo_estado, recorrido + [paso]))
+            else:
+                break
     return recorrido
 
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
     recorrido = []
-    coste_acumulado=0
-    coste_nuevo=0
+    coste_acumulado = 0
     por_visitar = util.PriorityQueue()
     visitados = set()
     por_visitar.push((problem.getStartState(), recorrido, coste_acumulado), coste_acumulado)
@@ -138,10 +134,11 @@ def uniformCostSearch(problem):
             if not problem.isGoalState(estado):
                 visitados.add(estado)
 
-                for e in problem.getSuccessors(estado):
-                    coste_nuevo=coste_acumulado+e[2]
-                    por_visitar.push((e[0], recorrido+[e[1]], coste_nuevo), coste_nuevo)
-            else: break
+                for nuevo_estado, paso, coste in problem.getSuccessors(estado):
+                    coste_nuevo = coste_acumulado + coste
+                    por_visitar.push((nuevo_estado, recorrido + [paso], coste_nuevo), coste_nuevo)
+            else:
+                break
     return recorrido
 
 
@@ -154,8 +151,6 @@ def nullHeuristic(state, problem=None):
 
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
     recorrido = []
     coste_acumulado = 0
     por_visitar = util.PriorityQueue()
@@ -163,7 +158,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     start = problem.getStartState()
 
     dist = heuristic(start, problem) + coste_acumulado
-    por_visitar.push((start, recorrido, coste_acumulado+0), dist)
+    por_visitar.push((start, recorrido, coste_acumulado + 0), dist)
 
     while not por_visitar.isEmpty():
         estado, recorrido, coste_acumulado = por_visitar.pop()
@@ -172,10 +167,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             if not problem.isGoalState(estado):
                 visitados.add(estado)
 
-                for e in problem.getSuccessors(estado):
-                    dist = heuristic(e[0], problem) + coste_acumulado + e[2]
-                    por_visitar.push((e[0], recorrido+[e[1]], coste_acumulado + e[2]), dist)
-            else: break
+                for nuevo_estado, paso, coste in problem.getSuccessors(estado):
+                    dist = heuristic(nuevo_estado, problem) + coste_acumulado + coste
+                    por_visitar.push((nuevo_estado, recorrido + [paso], coste_acumulado + coste), dist)
+            else:
+                break
     return recorrido
 
 

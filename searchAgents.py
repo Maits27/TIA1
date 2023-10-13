@@ -329,8 +329,8 @@ class CornersProblem(search.SearchProblem):
 
 
 
-    def getSuccessors(self, state):
 
+    def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
 
@@ -340,23 +340,15 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            # Add a successor state to the successor list if the action is legal
-            # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
-
-            "*** YOUR CODE HERE ***"
             pos, goals = state
             x, y = pos
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
             next = (nextx, nexty)
+
             if not hitsWall:
                 if next in self.corners:
                     if next not in goals:
@@ -398,9 +390,7 @@ def cornersHeuristic(state, problem):
     admissible (as well as consistent).
 
     """
-    corners = problem.corners  # These are the corner coordinates
-    #walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
-    "*** YOUR CODE HERE ***"
+    corners = problem.corners
     pos, goal = state
     por_ver = [c for c in corners if c not in goal]
     dist = 0
@@ -516,15 +506,26 @@ def foodHeuristic(state, problem):
 
     position, foodGrid = state
     por_comer = []
+    distMax_list = []
 
     for x, fila in enumerate(foodGrid):
         for y, comida in enumerate(fila):
             if comida:
-                por_comer.append((x,y))
-    distancias = [abs(por_comer[0] - position[0]) + abs(por_comer[1] - position[1]) for por_comer in por_comer]
-    if len(distancias)!=0:
-        return (max(distancias)+min(distancias))/2
-    return 0
+                por_comer.append((x, y))
+
+    puntos = len(por_comer)
+    if puntos == 0:
+        return 0
+
+    while por_comer:
+        distList = [abs(por_comer[0] - position[0]) + abs(por_comer[1] - position[1]) for por_comer in por_comer]
+
+        valor_maximo = max(distList)
+        distMax_list.append(valor_maximo)
+        punto_maximo = distList.index(valor_maximo)
+        position = por_comer.pop(punto_maximo)
+
+    return max(distMax_list)
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -552,7 +553,6 @@ class ClosestDotSearchAgent(SearchAgent):
         # Here are some useful elements of the startState
         startPosition = gameState.getPacmanPosition()
         food = gameState.getFood()
-        walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
         successors = util.Queue()
@@ -561,7 +561,8 @@ class ClosestDotSearchAgent(SearchAgent):
 
         while any(food):
             position, recorrido = successors.pop()
-            if problem.isGoalState(position): break
+            if problem.isGoalState(position):
+                break
             if position not in visitados:
                 visitados.add(position)
                 for s in problem.getSuccessors(position):
@@ -605,7 +606,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         if self.food[x][y]:
             self.food[x][y] = False
             return True
-        else: return False
+        else:
+            return False
 
 
 
