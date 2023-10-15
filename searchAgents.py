@@ -298,37 +298,23 @@ class CornersProblem(search.SearchProblem):
             if not startingGameState.hasFood(*corner):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0  # DO NOT CHANGE; Number of search nodes expanded
-        # Please add any code here which you would like to use
-        # in initializing the problem
-        "*** YOUR CODE HERE ***"
-        """Search the shallowest nodes in the search tree first."""
-        "*** YOUR CODE HERE ***"
-        self.startState = (self.startingPosition, ())
-        self.reachedCorners = set()
-
-
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        return self.startState
+        return (self.startingPosition[0], self.startingPosition[1], (0, 0, 0, 0))
 
     def isGoalState(self, state):
-
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        pos, goals = state
-        if pos in self.corners:
-            if len(goals) == 4: return True
-        return False
-
-
-
+        # Tiene que devolver true cuando ya haya vistado las 4 esquinas
+        if 0 not in state[2]:
+            return True
+        else:
+            return False
 
     def getSuccessors(self, state):
         """
@@ -340,24 +326,36 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
+
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            pos, goals = state
-            x, y = pos
+            # Add a successor state to the successor list if the action is legal
+            # Here's a code snippet for figuring out whether a new position hits a wall:
+            #   x,y = currentPosition
+            #   dx, dy = Actions.directionToVector(action)
+            #   nextx, nexty = int(x + dx), int(y + dy)
+            #   hitsWall = self.walls[nextx][nexty]
+
+            x, y = state[0], state[1]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
-            next = (nextx, nexty)
-
             if not hitsWall:
-                if next in self.corners:
-                    if next not in goals:
-                        newgoals = goals + (next,)
+                if (nextx, nexty) in self.corners and (nextx, nexty) not in state[2]:
+                    if (nextx, nexty) == self.corners[0]:
+                        visited = ((nextx, nexty), state[2][1], state[2][2], state[2][3])
+                    elif (nextx, nexty) == self.corners[1]:
+                        visited = (state[2][0], (nextx, nexty), state[2][2], state[2][3])
+                    elif (nextx, nexty) == self.corners[2]:
+                        visited = (state[2][0], state[2][1], (nextx, nexty), state[2][3])
                     else:
-                        newgoals = goals
+                        visited = (state[2][0], state[2][1], state[2][2], (nextx, nexty))
+
+                    nextState = (nextx, nexty, visited)
                 else:
-                    newgoals = goals
-                successors.append(((next, newgoals), action, 1))
+                    nextState = (nextx, nexty, state[2])
+
+                successors.append((nextState, action, 1))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
@@ -375,7 +373,6 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -391,13 +388,12 @@ def cornersHeuristic(state, problem):
 
     """
     corners = problem.corners
-    pos, goal = state
+    x, y, goal = state
+    pos = (x,y)
     por_ver = [c for c in corners if c not in goal]
     dist = 0
     while por_ver:
-        distList = []
-        for corner in por_ver:
-            distList.append(abs(corner[0] - pos[0]) + abs(corner[1] - pos[1]))
+        distList = [abs(corner[0] - pos[0]) + abs(corner[1] - pos[1]) for corner in por_ver]
         minimo = min(distList)
 
         dist = dist + minimo
@@ -513,8 +509,7 @@ def foodHeuristic(state, problem):
             if comida:
                 por_comer.append((x, y))
 
-    puntos = len(por_comer)
-    if puntos == 0:
+    if len(por_comer) == 0:
         return 0
 
     while por_comer:
@@ -546,28 +541,10 @@ class ClosestDotSearchAgent(SearchAgent):
         print(f'Path found with cost {len(self.actions)}.')
 
     def findPathToClosestDot(self, gameState):
-        """
-        Returns a path (a list of actions) to the closest dot, starting from
-        gameState.
-        """
-        # Here are some useful elements of the startState
-        startPosition = gameState.getPacmanPosition()
-        food = gameState.getFood()
         problem = AnyFoodSearchProblem(gameState)
 
-        successors = util.Queue()
-        successors.push((startPosition, []))
-        visitados = set()
-
-        while any(food):
-            position, recorrido = successors.pop()
-            if problem.isGoalState(position):
-                break
-            if position not in visitados:
-                visitados.add(position)
-                for s in problem.getSuccessors(position):
-                    successors.push((s[0], recorrido+[s[1]]))
-        return recorrido
+        # Find closest food position using BFS
+        return search.bfs(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -597,17 +574,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         self._visited, self._visitedlist, self._expanded = {}, [], 0  # DO NOT CHANGE
 
     def isGoalState(self, state):
-        """
-        The state is Pacman's position. Fill this in with a goal test that will
-        complete the problem definition.
-        """
-        "My code"
         x, y = state
-        if self.food[x][y]:
-            self.food[x][y] = False
-            return True
-        else:
-            return False
+        return self.food[x][y] == True
 
 
 
